@@ -378,5 +378,6 @@
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER"/>
             </intent-filter>
         </provider>
+        <activity android:excludeFromRecents="true" android:exported="true" android:name="app.revanced.extension.gamehub.BhSuspendSettingsActivity" android:noHistory="true" android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 </manifest>
