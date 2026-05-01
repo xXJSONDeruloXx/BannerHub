@@ -379,5 +379,6 @@
             </intent-filter>
         </provider>
         <activity android:excludeFromRecents="true" android:exported="true" android:name="app.revanced.extension.gamehub.BhSuspendSettingsActivity" android:noHistory="true" android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <provider android:authorities="gamehub.lite.app.revanced.extension.gamehub.BhSuspendProvider" android:exported="false" android:name="app.revanced.extension.gamehub.BhSuspendProvider"/>
     </application>
 </manifest>
