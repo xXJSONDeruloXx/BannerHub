@@ -360,8 +360,9 @@
 
 
     # BannerHub Proof-of-Concept: Show Toast
-    const-string v7, "BannerHub Proof-of-Concept!"
-    invoke-static {p0, v7, v0}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
+        # BannerHub: Add tabs via helper class
+    invoke-static {p0}, Lcom/xiaoji/eggame/BannerHubHelper;->addTabsToActivity(Landroid/app/Activity;)V
+
     move-result-object v7
     invoke-virtual {v7}, Landroid/widget/Toast;->show()V
 
