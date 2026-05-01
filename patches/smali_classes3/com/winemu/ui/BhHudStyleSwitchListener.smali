@@ -18,13 +18,13 @@
     }
 .end annotation
 
-.field public final synthetic a:Lcom/xj/winemu/view/SidebarSwitchItemView;
+.field public final synthetic a:Lcom/winemu/ui/SidebarSwitchItemView;
 .field public final synthetic b:Landroid/content/Context;
 
-.method public synthetic constructor <init>(Lcom/xj/winemu/view/SidebarSwitchItemView;Landroid/content/Context;)V
+.method public synthetic constructor <init>(Lcom/winemu/ui/SidebarSwitchItemView;Landroid/content/Context;)V
     .locals 0
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
-    iput-object p1, p0, Lcom/winemu/ui/BhHudStyleSwitchListener;->a:Lcom/xj/winemu/view/SidebarSwitchItemView;
+    iput-object p1, p0, Lcom/winemu/ui/BhHudStyleSwitchListener;->a:Lcom/winemu/ui/SidebarSwitchItemView;
     iput-object p2, p0, Lcom/winemu/ui/BhHudStyleSwitchListener;->b:Landroid/content/Context;
     return-void
 .end method
@@ -33,11 +33,11 @@
     .locals 8
 
     # ── Toggle switch, v1 = new state (1=on, 0=off) ──────────────────────────
-    iget-object v0, p0, Lcom/winemu/ui/BhHudStyleSwitchListener;->a:Lcom/xj/winemu/view/SidebarSwitchItemView;
-    invoke-virtual {v0}, Lcom/xj/winemu/view/SidebarSwitchItemView;->getSwitchState()Z
+    iget-object v0, p0, Lcom/winemu/ui/BhHudStyleSwitchListener;->a:Lcom/winemu/ui/SidebarSwitchItemView;
+    invoke-virtual {v0}, Lcom/winemu/ui/SidebarSwitchItemView;->getSwitchState()Z
     move-result v1
     xor-int/lit8 v1, v1, 0x1
-    invoke-virtual {v0, v1}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setSwitch(Z)V
+    invoke-virtual {v0, v1}, Lcom/winemu/ui/SidebarSwitchItemView;->setSwitch(Z)V
 
     # ── Get SharedPreferences (v3) ────────────────────────────────────────────
     iget-object v2, p0, Lcom/winemu/ui/BhHudStyleSwitchListener;->b:Landroid/content/Context;

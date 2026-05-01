@@ -45,20 +45,20 @@
     const v3, 0x7f0a0f0e
     invoke-virtual {v0, v3}, Landroid/view/View;->findViewById(I)Landroid/view/View;
     move-result-object v3
-    check-cast v3, Lcom/xj/winemu/view/SidebarSwitchItemView;
+    check-cast v3, Lcom/winemu/ui/SidebarSwitchItemView;
     if-eqz v3, :cond_adreno
 
     const-string v4, "sustained_perf"
     const/4 v6, 0x0
     invoke-interface {v2, v4, v6}, Landroid/content/SharedPreferences;->getBoolean(Ljava/lang/String;Z)Z
     move-result v4
-    invoke-virtual {v3, v4}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setSwitch(Z)V
+    invoke-virtual {v3, v4}, Lcom/winemu/ui/SidebarSwitchItemView;->setSwitch(Z)V
 
     if-eqz v5, :cond_sustained_no_root
 
     new-instance v4, Lcom/winemu/ui/SustainedPerfSwitchClickListener;
-    invoke-direct {v4, v3}, Lcom/winemu/ui/SustainedPerfSwitchClickListener;-><init>(Lcom/xj/winemu/view/SidebarSwitchItemView;)V
-    invoke-virtual {v3, v4}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setClickListener(Lkotlin/jvm/functions/Function0;)V
+    invoke-direct {v4, v3}, Lcom/winemu/ui/SustainedPerfSwitchClickListener;-><init>(Lcom/winemu/ui/SidebarSwitchItemView;)V
+    invoke-virtual {v3, v4}, Lcom/winemu/ui/SidebarSwitchItemView;->setClickListener(Lkotlin/jvm/functions/Function0;)V
     goto :cond_adreno
 
     :cond_sustained_no_root
@@ -70,20 +70,20 @@
     const v3, 0x7f0a0f0f
     invoke-virtual {v0, v3}, Landroid/view/View;->findViewById(I)Landroid/view/View;
     move-result-object v3
-    check-cast v3, Lcom/xj/winemu/view/SidebarSwitchItemView;
+    check-cast v3, Lcom/winemu/ui/SidebarSwitchItemView;
     if-eqz v3, :cond_winlator_hud
 
     const-string v4, "max_adreno_clocks"
     const/4 v6, 0x0
     invoke-interface {v2, v4, v6}, Landroid/content/SharedPreferences;->getBoolean(Ljava/lang/String;Z)Z
     move-result v4
-    invoke-virtual {v3, v4}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setSwitch(Z)V
+    invoke-virtual {v3, v4}, Lcom/winemu/ui/SidebarSwitchItemView;->setSwitch(Z)V
 
     if-eqz v5, :cond_adreno_no_root
 
     new-instance v4, Lcom/winemu/ui/MaxAdrenoClickListener;
-    invoke-direct {v4, v3}, Lcom/winemu/ui/MaxAdrenoClickListener;-><init>(Lcom/xj/winemu/view/SidebarSwitchItemView;)V
-    invoke-virtual {v3, v4}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setClickListener(Lkotlin/jvm/functions/Function0;)V
+    invoke-direct {v4, v3}, Lcom/winemu/ui/MaxAdrenoClickListener;-><init>(Lcom/winemu/ui/SidebarSwitchItemView;)V
+    invoke-virtual {v3, v4}, Lcom/winemu/ui/SidebarSwitchItemView;->setClickListener(Lkotlin/jvm/functions/Function0;)V
     goto :cond_winlator_hud
 
     :cond_adreno_no_root
@@ -102,8 +102,8 @@
 
     # Create SidebarSwitchItemView(context, null)
     const/4 v7, 0x0
-    new-instance v6, Lcom/xj/winemu/view/SidebarSwitchItemView;
-    invoke-direct {v6, v1, v7}, Lcom/xj/winemu/view/SidebarSwitchItemView;-><init>(Landroid/content/Context;Landroid/util/AttributeSet;)V
+    new-instance v6, Lcom/winemu/ui/SidebarSwitchItemView;
+    invoke-direct {v6, v1, v7}, Lcom/winemu/ui/SidebarSwitchItemView;-><init>(Landroid/content/Context;Landroid/util/AttributeSet;)V
 
     # Tag for re-lookup next time sidebar opens
     const-string v7, "bh_hud_switch"
@@ -128,17 +128,17 @@
 
     # Set state + click listener
     :cond_hud_switch_exists
-    check-cast v6, Lcom/xj/winemu/view/SidebarSwitchItemView;
+    check-cast v6, Lcom/winemu/ui/SidebarSwitchItemView;
 
     const-string v7, "winlator_hud"
     const/4 v8, 0x0
     invoke-interface {v2, v7, v8}, Landroid/content/SharedPreferences;->getBoolean(Ljava/lang/String;Z)Z
     move-result v7
-    invoke-virtual {v6, v7}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setSwitch(Z)V
+    invoke-virtual {v6, v7}, Lcom/winemu/ui/SidebarSwitchItemView;->setSwitch(Z)V
 
     new-instance v8, Lcom/winemu/ui/BhHudStyleSwitchListener;
-    invoke-direct {v8, v6, v1}, Lcom/winemu/ui/BhHudStyleSwitchListener;-><init>(Lcom/xj/winemu/view/SidebarSwitchItemView;Landroid/content/Context;)V
-    invoke-virtual {v6, v8}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setClickListener(Lkotlin/jvm/functions/Function0;)V
+    invoke-direct {v8, v6, v1}, Lcom/winemu/ui/BhHudStyleSwitchListener;-><init>(Lcom/winemu/ui/SidebarSwitchItemView;Landroid/content/Context;)V
+    invoke-virtual {v6, v8}, Lcom/winemu/ui/SidebarSwitchItemView;->setClickListener(Lkotlin/jvm/functions/Function0;)V
 
     # ── "Extra Detailed" CheckBox (below Winlator HUD switch) ────────────────
     const-string v3, "bh_hud_extra_cb"

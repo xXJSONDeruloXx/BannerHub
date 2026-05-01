@@ -1,0 +1,13 @@
+{
+  "name": "fwd-port-6_0",
+  "taskFile": ".ralph/fwd-port-6_0.md",
+  "iteration": 7,
+  "maxIterations": 30,
+  "itemsPerIteration": 2,
+  "reflectEvery": 5,
+  "reflectInstructions": "REFLECTION CHECKPOINT\n\nPause and reflect on your progress:\n1. What has been accomplished so far?\n2. What's working well?\n3. What's not working or blocking progress?\n4. Should the approach be adjusted?\n5. What are the next priorities?\n\nUpdate the task file with your reflection, then continue working.",
+  "active": true,
+  "status": "active",
+  "startedAt": "2026-05-01T15:29:11.594Z",
+  "lastReflectionAt": 6
+}

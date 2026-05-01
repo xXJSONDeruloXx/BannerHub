@@ -20,18 +20,18 @@
 # instance fields
 .field public final synthetic a:Lcom/winemu/ui/SidebarControlsFragment;
 
-.field public final synthetic b:Lcom/xj/winemu/view/SidebarSwitchItemView;
+.field public final synthetic b:Lcom/winemu/ui/SidebarSwitchItemView;
 
 
 # direct methods
-.method public synthetic constructor <init>(Lcom/winemu/ui/SidebarControlsFragment;Lcom/xj/winemu/view/SidebarSwitchItemView;)V
+.method public synthetic constructor <init>(Lcom/winemu/ui/SidebarControlsFragment;Lcom/winemu/ui/SidebarSwitchItemView;)V
     .locals 0
 
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     iput-object p1, p0, Lcom/winemu/ui/RtsSwitchClickListener;->a:Lcom/winemu/ui/SidebarControlsFragment;
 
-    iput-object p2, p0, Lcom/winemu/ui/RtsSwitchClickListener;->b:Lcom/xj/winemu/view/SidebarSwitchItemView;
+    iput-object p2, p0, Lcom/winemu/ui/RtsSwitchClickListener;->b:Lcom/winemu/ui/SidebarSwitchItemView;
 
     return-void
 .end method
@@ -41,15 +41,15 @@
 .method public final invoke()Ljava/lang/Object;
     .locals 3
 
-    iget-object v0, p0, Lcom/winemu/ui/RtsSwitchClickListener;->b:Lcom/xj/winemu/view/SidebarSwitchItemView;
+    iget-object v0, p0, Lcom/winemu/ui/RtsSwitchClickListener;->b:Lcom/winemu/ui/SidebarSwitchItemView;
 
     # Toggle the switch state
-    invoke-virtual {v0}, Lcom/xj/winemu/view/SidebarSwitchItemView;->getSwitchState()Z
+    invoke-virtual {v0}, Lcom/winemu/ui/SidebarSwitchItemView;->getSwitchState()Z
     move-result v1
 
     xor-int/lit8 v1, v1, 0x1
 
-    invoke-virtual {v0, v1}, Lcom/xj/winemu/view/SidebarSwitchItemView;->setSwitch(Z)V
+    invoke-virtual {v0, v1}, Lcom/winemu/ui/SidebarSwitchItemView;->setSwitch(Z)V
 
     # Save to preferences
     invoke-static {v1}, Lcom/xj/pcvirtualbtn/inputcontrols/InputControlsManager;->setRtsTouchControlsEnabled(Z)V
