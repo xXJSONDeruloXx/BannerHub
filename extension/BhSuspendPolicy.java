@@ -1,16 +1,17 @@
 package app.revanced.extension.gamehub;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
-import java.io.File;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.FileInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
+import java.util.List;
 
 /**
  * Suspend policy manager for BannerHub.
@@ -21,6 +22,9 @@ import java.io.IOException;
  * - "never":    Never suspend; keep Wine processes running.
  *
  * Wine processes are tracked via /proc and signaled with SIGSTOP/SIGCONT.
+ *
+ * Uses background monitoring to detect app foreground/background state.
+ * No smali modifications needed!
  */
 public class BhSuspendPolicy {
     private static final String TAG = "BH_SUSPEND";
@@ -29,14 +33,20 @@ public class BhSuspendPolicy {
     public static final String POLICY_MANUAL = "manual";
     public static final String POLICY_NEVER  = "never";
 
-    // SharedPreferences keys for per-container suspend policy.
-    // Container settings are stored in "pc_g_setting{containerId}" (same as GameHub).
+    // SharedPreferences keys
     private static final String KEY_SUSPEND_POLICY = "suspendPolicy";
+    private static final String KEY_DEFAULT_POLICY = "default_suspend_policy";
 
     // Runtime state
     private static boolean sSuspended = false;
     private static String sActivePolicy = POLICY_MANUAL; // default until set
     private static String sActiveContainerId = "";
+
+    // Monitoring
+    private static Handler sMonitorHandler = null;
+    private static Runnable sMonitorRunnable = null;
+    private static boolean sLastForegroundState = true; // assume foreground at start
+    private static final int MONITOR_INTERVAL_MS = 2000; // check every 2 seconds
 
     // Signal constants (same as ProcessHelper in GameNative)
     private static final int SIGSTOP = 19;
@@ -73,7 +83,26 @@ public class BhSuspendPolicy {
     }
 
     // ------------------------------------------------------------------------
-    //  Active session management (called from activity lifecycle / Wine task manager)
+    //  Default policy persistence
+    // ------------------------------------------------------------------------
+
+    /** Get the default suspend policy. */
+    public static String getDefaultPolicy(Context ctx) {
+        if (ctx == null) return POLICY_MANUAL;
+        SharedPreferences sp = ctx.getSharedPreferences("bh_prefs", Context.MODE_PRIVATE);
+        return normalizePolicy(sp.getString(KEY_DEFAULT_POLICY, POLICY_MANUAL));
+    }
+
+    /** Set the default suspend policy. */
+    public static void setDefaultPolicy(Context ctx, String policy) {
+        String normalized = normalizePolicy(policy);
+        SharedPreferences sp = ctx.getSharedPreferences("bh_prefs", Context.MODE_PRIVATE);
+        sp.edit().putString(KEY_DEFAULT_POLICY, normalized).apply();
+        Log.i(TAG, "Default suspend policy set to " + normalized);
+    }
+
+    // ------------------------------------------------------------------------
+    //  Active session management (called when Wine session starts/ends)
     // ------------------------------------------------------------------------
 
     /** Call when a Wine session starts. Sets the active policy for the current container. */
@@ -82,7 +111,7 @@ public class BhSuspendPolicy {
         if (!sActiveContainerId.isEmpty() && ctx != null) {
             sActivePolicy = getSuspendPolicy(ctx, sActiveContainerId);
         } else {
-            sActivePolicy = getDefaultPolicy(ctx != null ? ctx : null);
+            sActivePolicy = getDefaultPolicy(ctx);
         }
         sSuspended = false;
         Log.i(TAG, "Session start: container=" + sActiveContainerId + " policy=" + sActivePolicy);
@@ -107,7 +136,7 @@ public class BhSuspendPolicy {
     }
 
     // ------------------------------------------------------------------------
-    //  Suspend / Resume actions (called from onPause / onResume / UI button)
+    //  Suspend / Resume actions
     // ------------------------------------------------------------------------
 
     /** Suspend Wine processes if policy allows. Needs Context to read policy. */
@@ -132,6 +161,15 @@ public class BhSuspendPolicy {
         Log.i(TAG, "Resumed");
     }
 
+    /** Toggle suspend state (for manual resume button). Needs Context to read policy. */
+    public static void toggleSuspend(Context ctx) {
+        if (sSuspended) {
+            resumeIfSuspended();
+        } else {
+            suspendIfAllowed(ctx);
+        }
+    }
+
     /** Get the effective suspend policy: per-container if active, else global default. */
     private static String getEffectivePolicy(Context ctx) {
         if (!sActiveContainerId.isEmpty() && ctx != null) {
@@ -144,26 +182,72 @@ public class BhSuspendPolicy {
         return POLICY_MANUAL; // fallback
     }
 
-    /** Read global default suspend policy from "bh_prefs". */
-    public static String getDefaultPolicy(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences("bh_prefs", Context.MODE_PRIVATE);
-        return normalizePolicy(sp.getString("suspend_policy", POLICY_MANUAL));
+    // ------------------------------------------------------------------------
+    //  Foreground/Background monitoring (no smali changes needed!)
+    // ------------------------------------------------------------------------
+
+    /** Start monitoring app foreground/background state. Call from any Activity onCreate(). */
+    public static void startMonitoring(Context ctx) {
+        if (sMonitorHandler != null) {
+            Log.w(TAG, "Monitoring already started");
+            return;
+        }
+
+        sMonitorHandler = new Handler(Looper.getMainLooper());
+        sMonitorRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (ctx == null) return;
+
+                boolean isForeground = isAppInForeground(ctx);
+                
+                if (sLastForegroundState && !isForeground) {
+                    // App went to background
+                    Log.i(TAG, "App went to background");
+                    suspendIfAllowed(ctx);
+                } else if (!sLastForegroundState && isForeground) {
+                    // App came to foreground
+                    Log.i(TAG, "App came to foreground");
+                    resumeIfSuspended();
+                }
+                
+                sLastForegroundState = isForeground;
+                sMonitorHandler.postDelayed(this, MONITOR_INTERVAL_MS);
+            }
+        };
+        
+        sMonitorHandler.post(sMonitorRunnable);
+        Log.i(TAG, "Background monitoring started (interval: " + MONITOR_INTERVAL_MS + "ms)");
     }
 
-    /** Set global default suspend policy in "bh_prefs". */
-    public static void setDefaultPolicy(Context ctx, String policy) {
-        String normalized = normalizePolicy(policy);
-        SharedPreferences sp = ctx.getSharedPreferences("bh_prefs", Context.MODE_PRIVATE);
-        sp.edit().putString("suspend_policy", normalized).apply();
-        Log.i(TAG, "Default suspend policy set to " + normalized);
+    /** Stop monitoring. */
+    public static void stopMonitoring() {
+        if (sMonitorHandler != null && sMonitorRunnable != null) {
+            sMonitorHandler.removeCallbacks(sMonitorRunnable);
+            sMonitorHandler = null;
+            sMonitorRunnable = null;
+            Log.i(TAG, "Background monitoring stopped");
+        }
     }
 
-    /** Toggle suspend state (for manual resume button). Needs Context to read policy. */
-    public static void toggleSuspend(Context ctx) {
-        if (sSuspended) {
-            resumeIfSuspended();
-        } else {
-            suspendIfAllowed(ctx);
+    /** Check if the app is currently in the foreground. */
+    private static boolean isAppInForeground(Context ctx) {
+        try {
+            ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+            if (am == null) return true; // assume foreground if we cant check
+            
+            List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
+            if (processes == null) return true;
+            
+            for (ActivityManager.RunningAppProcessInfo proc : processes) {
+                if (proc.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking foreground state: " + e);
+            return true; // assume foreground on error
         }
     }
 
@@ -197,7 +281,7 @@ public class BhSuspendPolicy {
 
     /** List all PIDs whose /proc/<pid>/stat contains "wine" or ".exe". */
     private static List<String> listWinePids() {
-        List<String> result = new ArrayList<>();
+        List<String> result = new java.util.ArrayList<>();
         File proc = new File("/proc");
         String[] subdirs = proc.list();
         if (subdirs == null) return result;
@@ -208,10 +292,13 @@ public class BhSuspendPolicy {
             if (!statFile.exists()) continue;
             try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(statFile)))) {
                 String line = br.readLine();
-                if (line != null && (line.contains("wine") || line.contains(".exe"))) {
-                    result.add(name);
+                if (line != null) {
+                    String lowerLine = line.toLowerCase();
+                    if (lowerLine.contains("wine") || lowerLine.contains(".exe")) {
+                        result.add(name);
+                    }
                 }
-            } catch (IOException ignored) {}
+            } catch (Exception ignored) {}
         }
         return result;
     }
