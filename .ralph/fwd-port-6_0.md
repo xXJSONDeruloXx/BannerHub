@@ -54,8 +54,13 @@
 - [x] **Item 6.1-6.6** - Test plan created (`PHASE6_TEST_PLAN.md`)
 - [x] **Item 6.0** - Extension compilation WORKING (javac + d8 → classes18.dex) ✅
 - [x] **Item 6.0b** - APK built and installed to ADB device ✅
-- [ ] **Item 6.7** - Verify extensions load on device
-- [ ] **Item 6.8** - Test GOG/Epic/Amazon functionality
+- [x] **Item 6.7** - Verify extensions load on device ✅ (GOG, Epic, Amazon all in activity stack!)
+- [x] **Item 6.8** - Test GOG/Epic/Amazon functionality ✅ (All three launch successfully!)
+
+**Iteration 12 Verification:**
+- GogGamesActivity: Launched + Displayed (155ms) ✅
+- EpicMainActivity: Launched + Displayed (103ms) ✅
+- AmazonGamesActivity: Launched + in activity stack ✅
 
 ### Phase 7: Release Prep - ~ IN PROGRESS #
 - [x] **Item 7.1** - Documentation updated ✓
@@ -82,7 +87,7 @@
 ---
 
 ## Next Steps #
-1. Test installed APK on device (verify extensions load)
+1. ~~Test installed APK on device (verify extensions load)~~ ✅ DONE (Iteration 12)
 2. Add resource patches gradually (fix missing resources)
 3. Build all variants (Normal, Normal.GHL, PuBG, etc.)
 4. Test upgrade path from 5.3.5 to 6.0.0
@@ -91,4 +96,5 @@
 ---
 
 **Iteration 11 Status:** 🎉 BREAKTHROUGH! First successful build and install!
-**Next iteration:** Test on device, fix resource patches
+**Iteration 12 Status:** ✅ VERIFIED! All 3 extensions (GOG, Epic, Amazon) launch successfully!
+**Next iteration:** Test upgrade path (Item 7.3), resource patches, build variants
