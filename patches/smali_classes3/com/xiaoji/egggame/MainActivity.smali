@@ -353,7 +353,7 @@
 .end method
 
 .method public final onCreate(Landroid/os/Bundle;)V
-    .locals 8
+.locals 8
 
     .line 1
     const/4 v0, 0x0
