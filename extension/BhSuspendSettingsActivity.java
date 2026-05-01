@@ -6,6 +6,7 @@ import android.widget.RadioGroup;
 import android.widget.RadioButton;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,8 +24,8 @@ public class BhSuspendSettingsActivity extends Activity {
         super.onCreate(savedInstanceState);
         
         // Simple layout programmatically
-        RadioGroup layout = new RadioGroup(this);
-        layout.setOrientation(RadioGroup.VERTICAL);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(50, 50, 50, 50);
         
         TextView title = new TextView(this);
@@ -36,21 +37,24 @@ public class BhSuspendSettingsActivity extends Activity {
         currentPolicy = BhSuspendPolicy.getDefaultPolicy(this);
         Log.i(TAG, "Current policy: " + currentPolicy);
         
-        // Radio buttons
+        // RadioGroup for policy selection
+        policyGroup = new RadioGroup(this);
+        policyGroup.setOrientation(RadioGroup.VERTICAL);
+        
         RadioButton autoBtn = new RadioButton(this);
         autoBtn.setText("Suspend and auto-resume");
         autoBtn.setId(1);
-        layout.addView(autoBtn);
+        policyGroup.addView(autoBtn);
         
         RadioButton manualBtn = new RadioButton(this);
         manualBtn.setText("Suspend until Resume button (Default)");
         manualBtn.setId(2);
-        layout.addView(manualBtn);
+        policyGroup.addView(manualBtn);
         
         RadioButton neverBtn = new RadioButton(this);
         neverBtn.setText("Never suspend");
         neverBtn.setId(3);
-        layout.addView(neverBtn);
+        policyGroup.addView(neverBtn);
         
         // Set current selection
         if (BhSuspendPolicy.POLICY_AUTO.equals(currentPolicy)) {
@@ -61,10 +65,7 @@ public class BhSuspendSettingsActivity extends Activity {
             neverBtn.setChecked(true);
         }
         
-        policyGroup = new RadioGroup(this);
-        policyGroup.addView(autoBtn);
-        policyGroup.addView(manualBtn);
-        policyGroup.addView(neverBtn);
+        layout.addView(policyGroup);
         
         // Save button
         Button saveBtn = new Button(this);
