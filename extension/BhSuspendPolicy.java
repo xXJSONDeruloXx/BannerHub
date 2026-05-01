@@ -70,6 +70,11 @@ public class BhSuspendPolicy {
         Log.i(TAG, "Default suspend policy set to " + normalized);
     }
 
+    /** Returns true if the current session is suspended. */
+    public static boolean isSuspended() {
+        return sSuspended;
+    }
+
     // ------------------------------------------------------------------------
     //  Suspend / Resume actions
     // ------------------------------------------------------------------------
